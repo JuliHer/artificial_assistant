@@ -1,0 +1,49 @@
+0: cancelaction
+1: confirmaction
+2: wakeup
+3: denyaction
+4: help
+
+5: navigatetolocation
+6: checktraffic
+7: savelocation
+
+8: playaudio
+9: volumedown
+10: volumeup
+11: setvolume
+12: pauseaudio
+13: resumeaudio
+14: nexttrack
+15: previoustrack
+
+16: callcontact
+17: sendmessage
+
+18: setclimatelevel
+19: turnairon
+20: turnairoff
+21: openwindow
+22: closewindow
+23: rundiagnostic
+24: checkstatus
+
+25: getweathertoday
+26: gettime
+27: getdate
+
+28: activatemode
+
+29: greeting
+30: farewell
+31: thanks
+32: smalltalk
+33: opinionlight
+34: emotionlight
+35: jokeorfun
+36: acknowledgement
+
+
+
+37: callemergency
+38: sendlocationtocontact

@@ -1,0 +1,33 @@
+{
+  "name": "navigation",
+  "type": "software",
+  "confirmation": false,
+
+  "intents": {
+    "navigatetolocation":{
+        "required_entities": ["location"],
+        "entity_schema": {
+          "location":{
+            "type":"free"
+          }
+        }
+        
+    },
+    "checktraffic":{
+        "optional_entities": ["location"],
+        "entity_schema": {
+          "location":{
+            "type":"free"
+          }
+        }
+    },
+    "savelocation": {
+        "required_entities": ["name"],
+        "entity_schema": {
+          "name":{
+            "type":"free"
+          }
+        }
+    }
+  }
+}

@@ -1,0 +1,25 @@
+ner_settings:
+  max_words: 128
+  embedding_dim: 768
+  batch_size: 32
+  types: 9
+  version: n3
+
+intention_settings:
+  embedding_dim: 768
+  batch_size: 32
+  version: a1
+
+wakeword_settings:
+  KORA:
+    wake_word: KORA
+    version: w3
+    sample_rate: 16000
+    hop_ms: 20
+    frame_ms: 32
+    buffer_size: 64
+
+debug:
+  enabled: true
+  level: TRACE
+
