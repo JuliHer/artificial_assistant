@@ -98,8 +98,8 @@ pip install -r requirements.txt
 Clonar el repositorio:
 
 ```
-git clone https://github.com/tu-usuario/KORA.git
-cd KORA
+git clone https://github.com/JuliHer/artificial_assistant.git
+cd artificial_assistant
 ```
 
 Instalar dependencias:
@@ -147,7 +147,7 @@ Futuras mejoras planificadas:
 
 En desarrollo activo.
 
-Este proyecto forma parte de un sistema mayor de asistente inteligente modular orientado a automatización, robótica y sistemas embebidos.
+Este proyecto forma parte de un sistema mayor de asistente inteligente modular orientado a automatización, domotica y sistemas embebidos.
 
 ---
 
