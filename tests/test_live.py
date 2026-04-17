@@ -25,7 +25,7 @@ wakeword_model_path = str(project_root / "models" / "wakeword_detector" / f"KORA
 if os.path.exists(wakeword_model_path):
     wakeword_model = keras.models.load_model(wakeword_model_path)
 wake_word = WakeWordController(wakeword_model, threshold=0.8)
-recorder = Recorder(energy, silence_ms=1000, hop_ms=hops)
+recorder = Recorder(energy, silence_ms=500, hop_ms=hops)
 
 audioEngine = AudioEngine(mic, energy, vad, wake_word, recorder, hop_ms=hops, frame_ms=frames)
 

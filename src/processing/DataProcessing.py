@@ -114,7 +114,7 @@ class Process:
                             if i > 2:
                                 target_pos = random.randint(0, buffer_len - wake_len) if wake_len < buffer_len else 0
                             else:
-                                target_pos = random.randint(int(-wake_len*0.2), int(wake_len*0.2)) 
+                                target_pos = random.randint(int(-wake_len*0.05), int(wake_len*0.05)) 
 
 
                             start = wake_start - target_pos

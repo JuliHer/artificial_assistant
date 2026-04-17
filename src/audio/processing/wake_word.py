@@ -45,13 +45,13 @@ class WakeWordController:
     # -------------------------
     # Feature extraction
     # -------------------------
-    def extract_mel(self, audio: np.ndarray) -> np.ndarray:
+    def extract_mel(self, audio: np.ndarray, hop) -> np.ndarray:
         
         mel = librosa.feature.melspectrogram(
             y=audio,
             sr=self.sample_rate,
             n_fft=self.frame_len,
-            hop_length=self.frame_len,
+            hop_length=hop,
             n_mels=self.n_mel
         )
 
@@ -64,10 +64,21 @@ class WakeWordController:
     # Main processing
     # -------------------------
 
+    def refresh(self, audio: np.ndarray):
+        self.energy = np.sum(audio**2)
+
+        mel = self.extract_mel(audio, self.hop_len)
+       
+        self.buffer = mel[:,-self.frames:].T
+
+        self.buffer_audio = audio
+
+        self.ready = True
+
     def push(self, audio: np.ndarray):
         self.energy = np.sum(audio ** 2)
 
-        mel = self.extract_mel(audio)
+        mel = self.extract_mel(audio, self.frame_len)
 
         
         self.buffer.append(mel[:,0])
@@ -90,7 +101,7 @@ class WakeWordController:
             
             path = os.path.join(str(project_root / dir), filename)
 
-            audio_to_save = np.concatenate(self.buffer_audio).flatten()
+            audio_to_save = self.buffer_audio.flatten()
 
             print(len(audio_to_save))
             if np.max(np.abs(audio_to_save)) > 0:
