@@ -26,9 +26,9 @@ class AudioEngine:
     #Arranca el engine,  siempre comenzamos calibrando 
     def start(self):
         self.mic.start()
-        self.state = AudioState.CALIBRATING #Se calibra para llenar un buffer en el microfono, creo son 5s
+        self.state = AudioState.CALIBRATING     #Se calibra para llenar un buffer en el microfono, creo son 5s
         self.state_ts = time.monotonic()
-        print("INICIO") #FLAG: Solo para visualizar cuando inicia el modelo
+        print("INICIO")                         #FLAG: Solo para visualizar cuando inicia el modelo
         #Este codigo es el loop principal, libera al cpu del procesamiento innecesario
         while True:
             now = time.monotonic()
@@ -36,7 +36,9 @@ class AudioEngine:
 
             limit = 0
             while now >= self.next_tick and limit < 3:#ejecuta los ticks atrasados 
+                
                 self._tick()
+                
                 self.next_tick += self.hop_s
                 limit += 1
                 
@@ -49,8 +51,8 @@ class AudioEngine:
     #Lo que se ejecuta cada tick
     def _tick(self):
         audio = self.mic.get_last_seconds(self.frame_s) #se toman los ultimos ms que capturo el microfono
-
-        self.wake_word.push(audio) #apesar de no estar prediciendo, se debe de mandar al modelo del wake word para pre procesar las frecuencias
+        self.wake_word.refresh(self.mic.get_last_seconds(self.frame_s+self.hop_s*(self.wake_word.frames-1)))
+        #self.wake_word.push(audio) #apesar de no estar prediciendo, se debe de mandar al modelo del wake word para pre procesar las frecuencias
         #cada estado se llama independiente, no se ejecutan 2 estados en un solo tick, libera a la cpu de carga innecesaria
         if self.state == AudioState.CALIBRATING:
             self._calibrating(audio)
@@ -74,24 +76,26 @@ class AudioEngine:
         self.energy.initialize(audio)
 
         if time.monotonic() - self.state_ts > 1.5:
-            self._transition(AudioState.IDLE) #Pasamos al estado IDLE
+            self._transition(AudioState.IDLE)       #Pasamos al estado IDLE
 
     def _idle(self, audio):
         #Este es el estado de espera a cualquier accion, no recibe nada, solo esta al pendiente de algun ruido
         self.stats("IDLE")
         if self.energy.is_voice(audio): #Si escucha algun ruido
-            self._transition(AudioState.LISTENING) #Pasa a la escucha (Listening)
+            self._transition(AudioState.LISTENING)  #Pasa a la escucha (Listening)
     
     def _listening(self, audio):
         #Este es el estado mas importante, pues debe de decidir si lo que escucha en realidad es voz humana y ademas de reconocer si se dijo la palabra de activacion
         self.stats("Listening:..")
         if not self.energy.is_voice(audio) and self.t_counter == 0:
-            self._transition(AudioState.IDLE) #si el ruido se fue, se regresa al estado IDLE
-            self.vad.reset() #Se reinicia el vad
+            self._transition(AudioState.IDLE)   #si el ruido se fue, se regresa al estado IDLE
+            self.vad.reset()                    #Se reinicia el vad
             return
         
         if self.vad.is_speech(audio): #Si del frame que pasamos se detecta que es voz humana
+            
             score = self.wake_word.predict()        #Se predice con el modelo artesanal si se dijo la palabra clave
+            
             self.stats("Listening...",score)
             if score > self.wake_word.threshold:    #Se evalua la prediccion con un umbral y se inicia el contador
                 self.t_counter += 1
@@ -112,16 +116,16 @@ class AudioEngine:
         """self.bus.emit(
             Event(EventType.WAKE_WORD, {"timestamp": time.time()})
         )"""
-        self.recorder.start()#se comienza a grabar el comando del usuario
+        self.recorder.start()                               #se comienza a grabar el comando del usuario
         self.wake_word.save_window("Data/audio/captured")
-        self._transition(AudioState.RECORDING)#se pasa a grabar (Recording)
+        self._transition(AudioState.RECORDING)              #se pasa a grabar (Recording)
 
     def _recording(self, audio):
         self.stats("Recording")
-        self.recorder.append(audio) #el fragmento de audio se acumula
+        self.recorder.append(audio)             #el fragmento de audio se acumula
 
-        if self.recorder.should_stop(): #Si se detecta que se dejo de hablar
-            clip = self.recorder.stop() #se para la grabacion y se toma el clip grabado
+        if self.recorder.should_stop():         #Si se detecta que se dejo de hablar
+            clip = self.recorder.stop()         #se para la grabacion y se toma el clip grabado
 
             #Se emite un bus con el comando dicho por el usuario
             """self.bus.emit(
@@ -136,7 +140,7 @@ class AudioEngine:
             
 
             self.stats("Recording", "grabado")
-            self._transition(AudioState.IDLE)#se regresa a IDLE
+            self._transition(AudioState.IDLE)   #se regresa a IDLE
 
     def _transition(self, new_state):
         #Se registra el cambio y se guarda el momento en que se realizo
